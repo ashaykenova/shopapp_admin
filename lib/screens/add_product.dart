@@ -39,6 +39,7 @@ class _AddProductState extends State<AddProduct> {
 
   getCategoriesDropDown() {
     for (int i = 0; i < categories.length; i++) {
+      print(categories[i].data()['category']);
       setState(() {
         categoriesDropDown.insert(
             0,
@@ -67,7 +68,7 @@ class _AddProductState extends State<AddProduct> {
       ),
       body: Form(
         key: _formKey,
-        child: Column(
+        child: ListView(
           children: [
             Row(
               children: [
@@ -123,42 +124,77 @@ class _AddProductState extends State<AddProduct> {
                 style: TextStyle(color: red, fontSize: 14),
               ),
             ),
+            // Padding(
+            //   padding: const EdgeInsets.all(12.0),
+            //   child: TextFormField(
+            //     controller: productNameController,
+            //     decoration: InputDecoration(hintText: "Product name"),
+            //     validator: (value) {
+            //       if (value.isEmpty) {
+            //         return "You must enter the product name";
+            //       } else if (value.length > 10) {
+            //         return "Product name can't have more than 10 letters";
+            //       }
+            //       return null;
+            //     },
+            //   ),
+            // ),
             Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: TextFormField(
-                controller: productNameController,
-                decoration: InputDecoration(hintText: "Product name"),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return "You must enter the product name";
-                  } else if (value.length > 10) {
-                    return "Product name can't have more than 10 letters";
-                  }
-                  return null;
+              padding: const EdgeInsets.all(8.0),
+              child: TypeAheadField(
+                textFieldConfiguration: TextFieldConfiguration(
+                    autofocus: false,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Add category')),
+                suggestionsCallback: (pattern) async {
+                  return await _categoryService.getSuggestions(pattern);
+                },
+                itemBuilder: (context, suggestion) {
+                  return ListTile(
+                    leading: Icon(Icons.category),
+                    title: Text(suggestion.data()['category']),
+                  );
+                },
+                onSuggestionSelected: (suggestion) {
+                  setState(() {
+                    _currentCategory = suggestion.data()['category'];
+                  });
                 },
               ),
             ),
-            TypeAheadField(
-              textFieldConfiguration: TextFieldConfiguration(
-                  autofocus: false,
-                  style: DefaultTextStyle.of(context)
-                      .style
-                      .copyWith(fontStyle: FontStyle.italic),
-                  decoration: InputDecoration(border: OutlineInputBorder())),
-              suggestionsCallback: (pattern) async {
-                return await BackendService.getSuggestions(pattern);
-              },
-              itemBuilder: (context, suggestion) {
-                return ListTile(
-                  leading: Icon(Icons.category),
-                  title: Text(suggestion['name']),
-                );
-              },
-              onSuggestionSelected: (suggestion) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ProductPage(product: suggestion)));
-              },
-            )
+            Visibility(
+              visible: _currentCategory != null,
+              child: InkWell(
+                  child: Material(
+                borderRadius: BorderRadius.circular(20),
+                color: red,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _currentCategory,
+                          style: TextStyle(color: white),
+                        ),
+                      ),
+                      IconButton(
+                          icon: Icon(
+                            Icons.close,
+                            color: white,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _currentCategory = '';
+                            });
+                          })
+                    ],
+                  ),
+                ),
+              )),
+            ),
+
           ],
         ),
       ),
