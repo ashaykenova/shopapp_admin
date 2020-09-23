@@ -21,7 +21,10 @@ class ProductService {
           'name': productName,
           'id': productId,
           'brand': brand,
-          'category': category
+          'category': category,
+          'price': price,
+          'sizes': sizes,
+          'quantity': quantity
         });
   }
 }

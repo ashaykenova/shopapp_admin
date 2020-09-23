@@ -401,7 +401,9 @@ class _AddProductState extends State<AddProduct> {
           String imageUrl1;
           String imageUrl2;
           String imageUrl3;
+
           final FirebaseStorage storage = FirebaseStorage.instance;
+
           final String picture1 =
               '1${DateTime.now().millisecondsSinceEpoch.toString()}.jpg';
           StorageUploadTask task1 =
@@ -433,12 +435,15 @@ class _AddProductState extends State<AddProduct> {
                 price: double.parse(priceController.text),
                 sizes: selectedSizes,
                 images: imageList,
+                category: _currentCategory,
+                brand: _currentBrand,
                 quantity: int.parse(quantityController.text));
 
             _formKey.currentState.reset();
-            print(_formKey.toString());
             setState(() => isLoading = false);
+
             Fluttertoast.showToast(msg: "Product added");
+            Navigator.pop(context);
           });
         } else {
           setState(() => isLoading = false);
